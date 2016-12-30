@@ -160,14 +160,14 @@ a.in-button {
 .iconuser { 
 	width:64px; 
 	height:38px; 
-	background:url(../iconpeople.png) no-repeat center; 
+	background:url(../images/iconpeople.png) no-repeat center; 
 	float:left;
 	border-right:1px solid #c7c7c7;
 }
 .iconpass { 
 	width:64px;
 	height:38px; 
-	background:url(../iconsuo.png) no-repeat center; 
+	background:url(../images/iconsuo.png) no-repeat center; 
 	float:left;
 	border-right:1px solid #c7c7c7;
 }

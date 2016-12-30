@@ -9,19 +9,17 @@ html
     script(src='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js')
     script(src='https://cdn.ravenjs.com/2.1.0/raven.min.js')
     script(src='/js/oa.js')
-    script
-      | Raven.config('http://be75c559773e4e9f83faca1a4aebe7ea@192.168.100.119:9000/6').install();
-      | try {
-      |   var error = 20/0;
-      |   console.log(error.toString());
-      |   if (error != 1) throw new error('something went wrong!')
-      | } catch(err) {
-      |   handleRouteError(err);
-      | }
-      | function handleRouteError(err) {
-      |   Raven.captureException(err);
-      |   Raven.showReportDialog();
-      | };
+    script.
+      Raven.config('http://be75c559773e4e9f83faca1a4aebe7ea@192.168.100.119:9000/6').install();
+      try {
+        
+      } catch(err) {
+        handleRouteError(err);
+      }
+      function handleRouteError(err) {
+        Raven.captureException(err);
+        Raven.showReportDialog();
+      };
   body
     block content
     

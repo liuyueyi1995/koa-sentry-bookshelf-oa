@@ -1,0 +1,37 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title= title
+    link(rel='stylesheet' href='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet' href='/stylesheets/mycss.css')
+    script(src='http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js')
+    script(src='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js')
+  body
+    div(class='container')
+      div(class='row')
+        ul(class='list-inline')
+          li(class='col-lg-3 nonpadding')
+            p(class='content-title') 用户-数据库角色映射管理
+          li(class='col-lg-6 nonpadding')
+          li(class='float-right col-lg-3 nonpadding')
+            div(class='input-group')  
+              input(type='text' class='form-control' placeholder='搜索...')
+              span(class='input-group-btn')  
+                button(class='btn btn-warning btn-search') 搜索  
+      div(class='row')
+        table(id='user_app_table' class='table')
+          thead
+            tr
+              th 序号
+              th 用户名
+              th 数据库角色
+              th 操作
+          tbody
+            tr(class='success')
+              td 1
+              td liu
+              td dba
+              td
+                a(class='in-button' href='/select_dbrole' target='_self')
+                  button(type='button' class='btn btn-primary btn-xs btn-block') 管理

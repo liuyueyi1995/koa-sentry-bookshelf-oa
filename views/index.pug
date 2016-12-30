@@ -6,14 +6,18 @@ block content
       div.col-lg-5.nonpadding
         h1.title 应用管控平台
       div.col-lg-5.nonpadding
-      div.col-lg-2.nonpadding.float-right
-        span#user_name.title3 管理员用户名
-        span#exit.title3 退出
         form(role='form')
           label.title3 当前应用:
           select#current_app
             option 应用1
-            option 应用2         
+            option 应用2   
+      div.col-lg-2.nonpadding.float-right
+        - if (!user)
+            a(class='btn btn-primary btn-lg' href='/login' role="button") 登录
+            a(class='btn btn-primary btn-lg' href='/reg' role="button") 注册
+        - else
+            span#user_name.title3 管理员用户名
+            span#exit.title3 退出             
     div.row
       div.col-lg-12.nonpadding
         ul.nav.nav-pills.nav-justified
@@ -22,31 +26,31 @@ block content
               b.caret
             ul.dropdown-menu(role='menu',aria-labelledby='TabDrop1')
               li
-                a(href='./user_app.html',tabindex='-1' ,target='frmpage') 用户-应用角色
+                a(href='/user_app',tabindex='-1' ,target='frmpage') 用户-应用角色
               li
-                a(href='./user_db.html',tabindex='-1' ,target='frmpage') 用户-数据库角色
+                a(href='/user_db',tabindex='-1' ,target='frmpage') 用户-数据库角色
           li.dropdown
             a#TabDrop2.navitem.dropdown-toggle(href='#',data-toggle='dropdown') WAF规则管理
               b.caret
             ul.dropdown-menu(role='menu',aria-labelledby='TabDrop2')
               li
-                a(href='./role_function.html',tabindex='-1' ,target='frmpage') 角色-功能
+                a(href='/role_function',tabindex='-1' ,target='frmpage') 角色-功能
               li
-                a(href='./function_url.html',tabindex='-1' ,target='frmpage') 功能-URL
+                a(href='/function_url',tabindex='-1' ,target='frmpage') 功能-URL
           li
-            a.navitem(href='./role_table.html',target='frmpage') SQLrelay规则管理
+            a.navitem(href='/role_table',target='frmpage') SQLrelay规则管理
           li.dropdown
             a#TabDrop3.navitem.dropdown-toggle(href='#',data-toggle='dropdown') 日志管理 
               b.caret
             ul.dropdown-menu(role='menu',aria-labelledby='TabDrop3')
               li
-                a(href='./waf_log.html',tabindex='-1' ,target='frmpage') WAF日志
+                a(href='/waf_log',tabindex='-1' ,target='frmpage') WAF日志
               li
-                a(href='./sqlrelay_log.html',tabindex='-1' ,target='frmpage') SQLrelay日志
+                a(href='/sqlrelay_log',tabindex='-1' ,target='frmpage') SQLrelay日志
           li
-            a.navitem(href='./import.html',target='frmpage') 导入
+            a.navitem(href='/import',target='frmpage') 导入
           li
-            a.navitem(href='./setting.html',target='frmpage') 配置
+            a.navitem(href='/setting',target='frmpage') 配置
   div.container
     iframe(name='frmpage' src='/html/default.html') 
       p Welcome!
