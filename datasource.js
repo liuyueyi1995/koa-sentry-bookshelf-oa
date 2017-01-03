@@ -15,6 +15,11 @@ var knex = require('knex')({
 
 var bookshelf = require('bookshelf')(knex);
 
+var User = bookshelf.Model.extend({
+    tableNmae: 'users'
+});
+
+/*
 var save = bookshelf.Model.prototype.save;
 bookshelf.Model.prototype.save = function () {
     if(arguments[1] && arguments[1].transacting){
@@ -54,7 +59,7 @@ bookshelf.Model.prototype.findOrCreate = function (options) {
             throw err;
         });
 };
-
+*/
 module.exports = {
     knex: knex,
     bookshelf: bookshelf

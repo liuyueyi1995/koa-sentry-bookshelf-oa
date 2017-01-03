@@ -7,9 +7,26 @@ const onerror = require('koa-onerror');
 const bodyparser = require('koa-bodyparser')();
 const logger = require('koa-logger');
 const co = require('co');
+const crypto = require('crypto');
 const Promise = require('bluebird');
 const Raven = require('raven');
-const ds = require('./datasource');
+const config = require('./config');
+
+const knex = require('knex')({
+    client: 'pg',
+    connection: {
+        host: config.host,
+        user: config.username,
+        password : config.password,
+        database : config.database,
+        port: config.port
+    }
+});
+const bookshelf = require('bookshelf')(knex);
+
+const Users = bookshelf.Model.extend({
+    tableName: 'users'
+});
 
 
 //const index = require('./routes/index');
@@ -70,7 +87,7 @@ router.get('/reg', async function (ctx, next) {
   ctx.state = {
     title: 'OA-注册'
   };
-
+  
   await ctx.render('reg', {
   });
   await next();
@@ -104,20 +121,51 @@ router.get('/user_db', async function (ctx, next) {
 });
 
 router.post('/reg', async function (ctx, next) {
-  if(ctx.request.body['password2'] != ctx.request.body['password']) {
-    //ctx.request.flash('error', '两次密码不一致');
+  //判断两次密码是否一致
+  if(ctx.request.body['password2'] !== ctx.request.body['password']) {
+    console.log('两次密码不一致');
     return ctx.response.redirect('/reg');
   } else {
-    return ctx.response.redirect('/done');
+    //判断用户名是否存在
+    var count = await Users.where('username', ctx.request.body['username']).count('username');
+    if(count != 0) {
+      console.log('用户名已存在！');
+      return ctx.response.redirect('/reg');
+    } else {
+      var hmac = crypto.createHmac('sha256', 'liuyueyi');
+      var password = hmac.update(ctx.request.body['password']).digest('hex');
+      console.log(password);
+      console.log(password.length);
+      var newUser = new Users({
+        username: ctx.request.body['username'],
+        password: password
+      })
+      await newUser.save();
+      console.log('注册成功，可以直接登录！');
+      return ctx.response.redirect('/login');
+    }
   }
+  
   await next();
 });
 
 router.post('/login', async function (ctx, next) {
-  if(ctx.request.body['password2'] != ctx.request.body['password']) {
+  //需要判断的逻辑：用户名不存在或者密码错误
+  var count = await Users.where('username', ctx.request.body['username']).count('username');
+  if(count == 0) {
+    console.log('用户名不存在！');
     return ctx.response.redirect('/login');
   } else {
-    return ctx.response.redirect('/');
+    var hmac = crypto.createHmac('sha256', 'liuyueyi');
+    var password = hmac.update(ctx.request.body['password']).digest('hex');
+    var user = await Users.where('username', ctx.request.body['username']).fetch();
+    if (user.attributes.password == password) {
+      console.log('登陆成功！');
+      return ctx.response.redirect('/');
+    } else {
+      console.log('密码错误！');
+      return ctx.response.redirect('/login');
+    }
   }
   //await next();
 });
@@ -127,6 +175,7 @@ app.use(router.routes(), router.allowedMethods());
 app.on('error', function(err){
   //console.log(err)
   //log.error('server error', err, ctx);
+  
   Raven.captureException(err);
 });
 
