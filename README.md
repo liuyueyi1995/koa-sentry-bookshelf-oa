@@ -1,13 +1,29 @@
-#koa2-sentry-bookshelf-example
+#koa2-sentry-bookshelf-oa
 ##简介
-基础文件结构fork自https://github.com/17koa/koa-demo
-这是用于演示sentry功能的例子
+这是一个基于koa2的OA系统
 
-- 采用koa框架
-- 前端部分节选自我之前一个项目
+数据库:PostgreSql
+ORM:bookshelf + knex
+并使用了sentry作为错误的收集反馈平台
+目录结构和babel的配置参考了https://github.com/17koa/koa-demo
 
+---
+##sentry客户端
+###安装并运行
 
+- git clone xxxx
+- cd xxx
+- npm install
+- npm build
+- npm start
+
+访问本机的3000端口即可访问
 
 ---
 ##sentry管理端
-通过访问http://192.168.100.119:9000进入管理端，
+通过访问http://192.168.100.119:9000进入管理端，使用超级用户的身份登录。
+
+
+---
+##sentry的安装
+可以参考我写的博客http://blog.csdn.net/liuyueyi1995/article/details/53888312
