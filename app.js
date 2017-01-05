@@ -6,12 +6,14 @@ const json = require('koa-json');
 const onerror = require('koa-onerror');
 const bodyparser = require('koa-bodyparser')();
 const logger = require('koa-logger');
+const session = require('koa-session-store');
+const mongoStore = require('koa-session-mongo');
 const co = require('co');
 const crypto = require('crypto');
 const Promise = require('bluebird');
 const Raven = require('raven');
 const config = require('./config');
-
+const settings = require('./settings')
 const knex = require('knex')({
     client: 'pg',
     connection: {
@@ -36,30 +38,22 @@ const Users = bookshelf.Model.extend({
 
 const app = new Koa();
 Raven.config('http://be75c559773e4e9f83faca1a4aebe7ea:1a5349ab38004ded9a737ce58ef8d2a3@192.168.100.119:9000/6').install();
-/*
-knex.schema.createTableIfNotExists('Users', function(table) {
-  table.increments();
-  table.string('username');
-  table.string('password');
-  table.timestamps();
-});
-*/
-
 
 // middlewares
 app.use(convert(bodyparser));
 app.use(convert(json()));
 app.use(convert(logger()));
 app.use(convert(require('koa-static')(__dirname + '/public')));
+app.keys = ['liuyueyi'];
+app.use(convert(session({
+  store: mongoStore.create({
+    db: 'oa-session'
+  })
+})));
 
 app.use(views(__dirname + '/views', {
   extension: 'pug'
 }));
-
-// app.use(views(__dirname + '/views-ejs', {
-//   extension: 'ejs'
-// }));
-
 
 // logger
 app.use(async (ctx, next) => {
@@ -124,13 +118,21 @@ router.post('/reg', async function (ctx, next) {
   //判断两次密码是否一致
   if(ctx.request.body['password2'] !== ctx.request.body['password']) {
     console.log('两次密码不一致');
-    return ctx.response.redirect('/reg');
+    //return ctx.response.redirect('/reg');
+    await ctx.render('reg', {
+      title: 'OA-注册',
+      error: '两次密码不一致'
+    });
   } else {
     //判断用户名是否存在
     var count = await Users.where('username', ctx.request.body['username']).count('username');
     if(count != 0) {
       console.log('用户名已存在！');
-      return ctx.response.redirect('/reg');
+      //return ctx.response.redirect('/reg');
+      await ctx.render('reg', {
+        title: 'OA-注册',
+        error: '用户名已存在'
+      });
     } else {
       var hmac = crypto.createHmac('sha256', 'liuyueyi');
       var password = hmac.update(ctx.request.body['password']).digest('hex');
@@ -139,10 +141,15 @@ router.post('/reg', async function (ctx, next) {
       var newUser = new Users({
         username: ctx.request.body['username'],
         password: password
-      })
+      });
       await newUser.save();
       console.log('注册成功，可以直接登录！');
-      return ctx.response.redirect('/login');
+      ctx.session.user = newUser;
+      await ctx.render('reg', {
+        title: 'OA-注册',
+        success: '注册成功，可以直接登录'
+      });
+      return ctx.redirect('/login');
     }
   }
   
@@ -154,17 +161,31 @@ router.post('/login', async function (ctx, next) {
   var count = await Users.where('username', ctx.request.body['username']).count('username');
   if(count == 0) {
     console.log('用户名不存在！');
-    return ctx.response.redirect('/login');
+    //return ctx.response.redirect('/login');
+    await ctx.render('login', {
+      title: 'OA-登录',
+      error: '用户名不存在'
+    });
   } else {
     var hmac = crypto.createHmac('sha256', 'liuyueyi');
     var password = hmac.update(ctx.request.body['password']).digest('hex');
     var user = await Users.where('username', ctx.request.body['username']).fetch();
     if (user.attributes.password == password) {
-      console.log('登陆成功！');
-      return ctx.response.redirect('/');
+      console.log('登陆成功！'+ user.attributes.username);
+      ctx.session.user = user.attributes.username;
+      //console.log(currentUser);
+      //return ctx.response.redirect('/');
+      await ctx.render('index', {
+        title: 'OA',
+        user: ctx.session.user
+      });
     } else {
       console.log('密码错误！');
-      return ctx.response.redirect('/login');
+      //return ctx.response.redirect('/login');
+      await ctx.render('login', {
+        title: 'OA-登录',
+        error: '密码错误'
+      });
     }
   }
   //await next();

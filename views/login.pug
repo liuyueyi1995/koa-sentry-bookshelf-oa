@@ -13,13 +13,15 @@ html
         div.col-lg-4.nonpadding
         div.col-lg-8.nonpadding
           p.title 应用管控平台
+      div.row
+        include alert.pug
     div.loginbox
       form(method='post')
         div.userbox
           div.iconuser
-          input#username.inputuser(name='username', tabindex='1', placeholder='请输入管理员用户名', type='text', value='', size='25', autocomplete='false')
+          input#username.inputuser(name='username', tabindex='1', placeholder='请输入管理员用户名', type='text', value='', size='25', autocomplete='false',required autofocus)
         div.userbox
           div.iconpass
-          input#password.inputuser(name='password', tabindex='2', placeholder='请输入管理员密码', type='password', value='', size='25', autocomplete='false')
+          input#password.inputuser(name='password', tabindex='2', placeholder='请输入管理员密码', type='password', value='', size='25', autocomplete='false',required)
         div.btnbox
           input.submitbtn(type='submit', value='登录')
