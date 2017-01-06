@@ -2,7 +2,6 @@
 Author: liuyueyi0126@qq.com
 */
 $(function (){
-	
 	$('.btn-danger').bind('click',function(event) {
 		var del=false;
 		del=confirm("确定要删除吗？");

@@ -29,7 +29,9 @@ const bookshelf = require('bookshelf')(knex);
 const Users = bookshelf.Model.extend({
     tableName: 'users'
 });
-
+const WafLogs = bookshelf.Model.extend({
+    tableName: 'waf_logs'
+});
 
 //const index = require('./routes/index');
 //const users = require('./routes/users');
@@ -119,7 +121,30 @@ router.get('/user_db', async function (ctx, next) {
   });
   //await next();
 });
+router.get('/waf_log', async function (ctx, next) {
+  var wafLogs = await WafLogs.fetchAll();//从数据库中查询所有的日志信息
+  var logs = {};
+  for(var i = 0;i < wafLogs.length;i++){
+    logs[i] = wafLogs.models[i].attributes;
+  }
+  //console.log(logs);
+  
+  await ctx.render('waf_log', {
+    title: 'OA-waf日志',
+    logs: logs
+  });
+  
+  //await next();
+});
+router.get('/sqlrelay_log', async function (ctx, next) {
+  ctx.state = {
+    title: 'OA-sqlrelay日志'
+  };
 
+  await ctx.render('sqlrelay_log', {
+  });
+  //await next();
+});
 router.post('/reg', async function (ctx, next) {
   if(ctx.request.body['username'].length > 25) {
     //判断用户名是否过长，数据库设置username字段为varchar(25)

@@ -1,0 +1,49 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title= title
+    link(rel='stylesheet' href='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet' href='/stylesheets/mycss.css')
+    script(src='http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js')
+    script(src='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js')
+    script.
+      $(function (){
+        $('tr').bind(function(){
+          console.log('1');
+          console.log($(this).children().last());
+          if($(this).text() == 'true') {
+            $(this).parent().addClass('success');
+          } else {
+            $(this).parent().addClass('danger');
+          }
+        });
+      });
+  body
+    div.container
+      div.row
+        ul.list-inline
+          li.col-lg-3.nonpadding
+            p.content-title WAF日志
+          li.col-lg-6.nonpadding
+          li.float-right.col-lg-3.nonpadding
+            div.input-group
+              input.form-control(type='text',placeholder='搜索...')
+              span.input-group-btn
+                button.btn.btn-warning.btn-search 搜索
+      div.row
+        table.table
+          thead
+            tr
+              th 序号
+              th 时间
+              th 用户名
+              th 访问的功能
+              th 访问的URL
+              th 参数
+              th 操作结果
+          tbody
+            each log in logs
+              tr.log-table
+              each val in log
+                th #{val} 

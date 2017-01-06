@@ -1,0 +1,34 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title= title
+    link(rel='stylesheet' href='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet' href='/stylesheets/mycss.css')
+    script(src='http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js')
+    script(src='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js')
+  body
+    div.container
+      div.row
+        ul.list-inline
+          li.col-lg-3.nonpadding
+            p.content-title SQLrelay日志
+          li.col-lg-6.nonpadding
+          li.float-right.col-lg-3.nonpadding
+            div.input-group
+              input.form-control(type='text',placeholder='搜索...')
+              span.input-group-btn
+                button.btn.btn-warning.btn-search 搜索
+      div.row
+        table.table
+          thead
+            tr
+              th 序号
+              th 时间
+              th 应用名
+              th 操作者用户名
+              th 操作者角色
+              th 操作语句
+              th 操作结果
+          tbody
+            
