@@ -13,7 +13,7 @@ const crypto = require('crypto');
 const Promise = require('bluebird');
 const Raven = require('raven');
 const config = require('./config');
-const settings = require('./settings')
+//const settings = require('./settings')
 const knex = require('knex')({
     client: 'pg',
     connection: {
@@ -70,12 +70,13 @@ app.use(async (ctx, next) => {
 
 router.get('/', async function (ctx, next) {
   ctx.state = {
-    title: 'OA'
+    title: 'OA',
+    user: ctx.session.user
   };
 
   await ctx.render('index', {
   });
-  await next();
+  //await next();
 });
 router.get('/reg', async function (ctx, next) {
   ctx.state = {
@@ -84,7 +85,7 @@ router.get('/reg', async function (ctx, next) {
   
   await ctx.render('reg', {
   });
-  await next();
+  //await next();
 });
 router.get('/login', async function (ctx, next) {
   ctx.state = {
@@ -93,7 +94,12 @@ router.get('/login', async function (ctx, next) {
 
   await ctx.render('login', {
   });
-  await next();
+  //await next();
+});
+router.get('/logout', async function (ctx, next) {
+  ctx.session.user = null;
+  return ctx.redirect('/');
+  //await next();
 });
 router.get('/user_app', async function (ctx, next) {
   ctx.state = {
@@ -102,7 +108,7 @@ router.get('/user_app', async function (ctx, next) {
 
   await ctx.render('user_app', {
   });
-  await next();
+  //await next();
 });
 router.get('/user_db', async function (ctx, next) {
   ctx.state = {
@@ -111,12 +117,18 @@ router.get('/user_db', async function (ctx, next) {
 
   await ctx.render('user_db', {
   });
-  await next();
+  //await next();
 });
 
 router.post('/reg', async function (ctx, next) {
-  //判断两次密码是否一致
-  if(ctx.request.body['password2'] !== ctx.request.body['password']) {
+  if(ctx.request.body['username'].length > 25) {
+    //判断用户名是否过长，数据库设置username字段为varchar(25)
+    await ctx.render('reg', {
+      title: 'OA-注册',
+      error: '用户名不得超过25个字符'
+    });
+  } else if(ctx.request.body['password2'] !== ctx.request.body['password']) {
+    //判断两次密码是否一致
     console.log('两次密码不一致');
     //return ctx.response.redirect('/reg');
     await ctx.render('reg', {
@@ -153,7 +165,7 @@ router.post('/reg', async function (ctx, next) {
     }
   }
   
-  await next();
+  //await next();
 });
 
 router.post('/login', async function (ctx, next) {
@@ -174,11 +186,7 @@ router.post('/login', async function (ctx, next) {
       console.log('登陆成功！'+ user.attributes.username);
       ctx.session.user = user.attributes.username;
       //console.log(currentUser);
-      //return ctx.response.redirect('/');
-      await ctx.render('index', {
-        title: 'OA',
-        user: ctx.session.user
-      });
+      return ctx.response.redirect('/');
     } else {
       console.log('密码错误！');
       //return ctx.response.redirect('/login');
