@@ -9,14 +9,14 @@ html
     script(src='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js')
     script.
       $(function (){
-        $('tr').bind(function(){
-          console.log('1');
-          console.log($(this).children().last());
-          if($(this).text() == 'true') {
-            $(this).parent().addClass('success');
-          } else {
-            $(this).parent().addClass('danger');
-          }
+        $(document).ready(function(){
+          $('td:last-child').each(function() {
+            if($.trim($(this).text()) == 'true') {
+              $(this).parent().addClass('success');
+            } else {
+              $(this).parent().addClass('danger');
+            }
+          });         
         });
       });
   body
@@ -44,6 +44,6 @@ html
               th 操作结果
           tbody
             each log in logs
-              tr.log-table
+              tr
               each val in log
-                th #{val} 
+                td #{val} 
