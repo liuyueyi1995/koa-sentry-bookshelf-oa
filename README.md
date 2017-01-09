@@ -2,19 +2,21 @@
 ##简介
 这是一个基于koa2的OA系统，作为我自学nodejs的练习以及成果展示
 
-使用 PostgreSql 存储业务数据 
+使用 PostgreSql 存储业务数据    
 使用 bookshelf + knex 作为ORM和query builder  
-使用 sentry 作为错误的收集反馈平台  
-使用 mongodb 存储session  
-目录结构和babel的配置参考了https://github.com/17koa/koa-demo  
+使用 sentry 作为错误的收集反馈平台   
+使用 mongodb 存储session    
+
+目录结构和babel的配置参考了https://github.com/17koa/koa-demo    
 网站的前端代码来源于我之前的一个项目  
 
 ---
 ##完成度  
 基本的页面跳转逻辑已经实现  
 登录注册以及session存储已经完成，不过还缺少如忘记密码等更进一步的功能  
-简单数据库查询已经完成，目前已经完成/waf_log页的逻辑，/sqlrelay\_log页的逻辑是类似的  
-
+简单数据库查询已经完成，目前已经完成/waf_log页的逻辑，/sqlrelay\_log页的逻辑是类似的    
+通过AJAX实现搜索功能，并动态修改网页内容     
+通过where 'xxx' like 'yyy'类型的语句实现了针对日志数据的全字段的模糊搜索      
 
 
 

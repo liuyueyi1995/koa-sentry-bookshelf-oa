@@ -26,7 +26,10 @@ html
           $.post('/waf_log',{content:content},function(result){
             let length = result.len;
             if ($.isEmptyObject(result.logs)) { //如果没有查询到数据则返回提示
-              $('#table').html("<br /><br /><br /><p class='content-title'>No result matched the given condition!<br />Refresh (F5) and retry!</p>");
+              alert(`
+              No result matched the given condition!
+
+              Please retry!`);
             } else { //如果查询到数据则动态生成表格               
               let tbody = $('tbody');
               tbody.html("");

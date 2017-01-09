@@ -139,13 +139,41 @@ router.get('/waf_log', async function (ctx, next) {
 });
 //采用AJAX处理对waf_log表的查询
 router.post('/waf_log',async function(ctx,next) {
-  console.log(ctx.request.body);
-  var content = ctx.request.body.content;
-  console.log(content);
-  var result = await WafLogs.where('id','=',content).fetchAll();       
   var logs = {};
-  for(var len = 0;len < result.length;len++){
-    logs[len] = result.models[len].attributes;
+  var len = 0;
+  var content = ctx.request.body.content;
+  var content1 = '%'+content+'%'; 
+  if (typeof(content) == Number) {
+    var result1 = await WafLogs.where('id','=',content).fetchAll(); 
+    for(;len < result1.length;len++){
+      logs[len] = result1.models[len].attributes;
+    }
+  }
+  var result2 = await WafLogs.where('time','like',content1).fetchAll(); 
+  var result3 = await WafLogs.where('username','like',content1).fetchAll(); 
+  var result4 = await WafLogs.where('function','like',content1).fetchAll(); 
+  var result5 = await WafLogs.where('url','like',content1).fetchAll(); 
+  var result6 = await WafLogs.where('param','like',content1).fetchAll(); 
+  var result7 = await WafLogs.where('result','like',content1).fetchAll(); 
+  
+  
+  for(;len < result2.length;len++){
+    logs[len] = result2.models[len].attributes;
+  }
+  for(;len < result3.length;len++){
+    logs[len] = result3.models[len].attributes;
+  }
+  for(;len < result4.length;len++){
+    logs[len] = result4.models[len].attributes;
+  }
+  for(;len < result5.length;len++){
+    logs[len] = result5.models[len].attributes;
+  }
+  for(;len < result6.length;len++){
+    logs[len] = result6.models[len].attributes;
+  }
+  for(;len < result7.length;len++){
+    logs[len] = result7.models[len].attributes;
   }
   ctx.body = {logs,len};
 });
