@@ -1,5 +1,6 @@
 const Koa = require('koa');
 const router = require('koa-router')();
+const koaBody = require('koa-body');
 const views = require('koa-views');
 const convert = require('koa-convert');
 const json = require('koa-json');
@@ -135,6 +136,18 @@ router.get('/waf_log', async function (ctx, next) {
   });
   
   //await next();
+});
+//采用AJAX处理对waf_log表的查询
+router.post('/waf_log',async function(ctx,next) {
+  console.log(ctx.request.body);
+  var content = ctx.request.body.content;
+  console.log(content);
+  var result = await WafLogs.where('id','=',content).fetchAll();       
+  var logs = {};
+  for(var len = 0;len < result.length;len++){
+    logs[len] = result.models[len].attributes;
+  }
+  ctx.body = {logs,len};
 });
 router.get('/sqlrelay_log', async function (ctx, next) {
   ctx.state = {

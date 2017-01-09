@@ -10,15 +10,50 @@ html
     script.
       $(function (){
         $(document).ready(function(){
+          $('.btn-search').click(search);
           $('td:last-child').each(function() {
             if($.trim($(this).text()) == 'true') {
               $(this).parent().addClass('success');
             } else {
               $(this).parent().addClass('danger');
             }
-          });         
+          }); 
         });
       });
+      function search() {
+        let content = $('#searchBox').val();
+        if (content) {
+          $.post('/waf_log',{content:content},function(result){
+            let length = result.len;
+            if ($.isEmptyObject(result.logs)) { //如果没有查询到数据则返回提示
+              $('#table').html("<br /><br /><br /><p class='content-title'>No result matched the given condition!<br />Refresh (F5) and retry!</p>");
+            } else { //如果查询到数据则动态生成表格               
+              let tbody = $('tbody');
+              tbody.html("");
+              for (var i = 0;i<length;i++) {
+                let tr = $('<tr></tr>');
+                tr.appendTo(tbody);
+                $('<td></td>').text(result.logs[i].id).appendTo(tr);
+                $('<td></td>').text(result.logs[i].time).appendTo(tr);
+                $('<td></td>').text(result.logs[i].username).appendTo(tr);
+                $('<td></td>').text(result.logs[i].function).appendTo(tr);
+                $('<td></td>').text(result.logs[i].url).appendTo(tr);
+                $('<td></td>').text(result.logs[i].param).appendTo(tr);
+                $('<td></td>').text(result.logs[i].result).appendTo(tr);
+                if ($.trim(result.logs[i].result) == 'true') {
+                  tr.addClass('success');
+                } else {
+                  tr.addClass('danger');
+                }
+              }
+            }
+          });
+        } else {
+          alert('There is no condition!');
+        }
+      }   
+                  
+      
   body
     div.container
       div.row
@@ -28,20 +63,20 @@ html
           li.col-lg-6.nonpadding
           li.float-right.col-lg-3.nonpadding
             div.input-group
-              input.form-control(type='text',placeholder='搜索...')
+              input#searchBox.form-control(type='text',placeholder='输入关键字，支持模糊查询',required)
               span.input-group-btn
-                button.btn.btn-warning.btn-search 搜索
-      div.row
+                input.btn.btn-warning.btn-search(type='submit',value='搜索') 
+      div#table.row
         table.table
           thead
             tr
-              th 序号
-              th 时间
-              th 用户名
-              th 访问的功能
-              th 访问的URL
-              th 参数
-              th 操作结果
+              th 序号（id）
+              th 时间（time）
+              th 用户名（username）
+              th 访问的功能（function）
+              th 访问的URL（url）
+              th 参数（param）
+              th 操作结果（result）
           tbody
             each log in logs
               tr
