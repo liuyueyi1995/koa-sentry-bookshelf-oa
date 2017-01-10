@@ -14,7 +14,6 @@ const crypto = require('crypto');
 const Promise = require('bluebird');
 const Raven = require('raven');
 const config = require('./config');
-//const settings = require('./settings')
 const knex = require('knex')({
     client: 'pg',
     connection: {
@@ -72,55 +71,34 @@ app.use(async (ctx, next) => {
 //router.use('/reg', reg.routes(), reg.allowedMethods());
 
 router.get('/', async function (ctx, next) {
-  ctx.state = {
+  await ctx.render('index', {
     title: 'OA',
     user: ctx.session.user
-  };
-
-  await ctx.render('index', {
   });
-  //await next();
 });
 router.get('/reg', async function (ctx, next) {
-  ctx.state = {
-    title: 'OA-注册'
-  };
-  
   await ctx.render('reg', {
+    title: 'OA-注册'
   });
-  //await next();
 });
 router.get('/login', async function (ctx, next) {
-  ctx.state = {
-    title: 'OA-登录'
-  };
-
   await ctx.render('login', {
+    title: 'OA-登录'
   });
-  //await next();
 });
 router.get('/logout', async function (ctx, next) {
   ctx.session.user = null;
   return ctx.redirect('/');
-  //await next();
 });
 router.get('/user_app', async function (ctx, next) {
-  ctx.state = {
-    title: 'OA-应用角色管理'
-  };
-
   await ctx.render('user_app', {
+    title: 'OA-应用角色管理'
   });
-  //await next();
 });
 router.get('/user_db', async function (ctx, next) {
-  ctx.state = {
-    title: 'OA-数据库角色管理'
-  };
-
   await ctx.render('user_db', {
+    title: 'OA-数据库角色管理'
   });
-  //await next();
 });
 router.get('/waf_log', async function (ctx, next) {
   var wafLogs = await WafLogs.fetchAll();//从数据库中查询所有的日志信息
@@ -128,14 +106,16 @@ router.get('/waf_log', async function (ctx, next) {
   for(var i = 0;i < wafLogs.length;i++){
     logs[i] = wafLogs.models[i].attributes;
   }
-  //console.log(logs);
   
   await ctx.render('waf_log', {
     title: 'OA-waf日志',
     logs: logs
   });
-  
-  //await next();
+});
+router.get('/sqlrelay_log', async function (ctx, next) {
+  await ctx.render('sqlrelay_log', {
+    title: 'OA-sqlrelay日志'
+  });
 });
 //采用AJAX处理对waf_log表的查询
 router.post('/waf_log',async function(ctx,next) {
@@ -155,7 +135,6 @@ router.post('/waf_log',async function(ctx,next) {
   var result5 = await WafLogs.where('url','like',content1).fetchAll(); 
   var result6 = await WafLogs.where('param','like',content1).fetchAll(); 
   var result7 = await WafLogs.where('result','like',content1).fetchAll(); 
-  
   
   for(;len < result2.length;len++){
     logs[len] = result2.models[len].attributes;
@@ -177,15 +156,7 @@ router.post('/waf_log',async function(ctx,next) {
   }
   ctx.body = {logs,len};
 });
-router.get('/sqlrelay_log', async function (ctx, next) {
-  ctx.state = {
-    title: 'OA-sqlrelay日志'
-  };
 
-  await ctx.render('sqlrelay_log', {
-  });
-  //await next();
-});
 router.post('/reg', async function (ctx, next) {
   if(ctx.request.body['username'].length > 25) {
     //判断用户名是否过长，数据库设置username字段为varchar(25)
@@ -196,7 +167,6 @@ router.post('/reg', async function (ctx, next) {
   } else if(ctx.request.body['password2'] !== ctx.request.body['password']) {
     //判断两次密码是否一致
     console.log('两次密码不一致');
-    //return ctx.response.redirect('/reg');
     await ctx.render('reg', {
       title: 'OA-注册',
       error: '两次密码不一致'
@@ -206,7 +176,6 @@ router.post('/reg', async function (ctx, next) {
     var count = await Users.where('username', ctx.request.body['username']).count('username');
     if(count != 0) {
       console.log('用户名已存在！');
-      //return ctx.response.redirect('/reg');
       await ctx.render('reg', {
         title: 'OA-注册',
         error: '用户名已存在'
@@ -214,8 +183,6 @@ router.post('/reg', async function (ctx, next) {
     } else {
       var hmac = crypto.createHmac('sha256', 'liuyueyi');
       var password = hmac.update(ctx.request.body['password']).digest('hex');
-      console.log(password);
-      console.log(password.length);
       var newUser = new Users({
         username: ctx.request.body['username'],
         password: password
@@ -230,8 +197,6 @@ router.post('/reg', async function (ctx, next) {
       return ctx.redirect('/login');
     }
   }
-  
-  //await next();
 });
 
 router.post('/login', async function (ctx, next) {
@@ -239,7 +204,6 @@ router.post('/login', async function (ctx, next) {
   var count = await Users.where('username', ctx.request.body['username']).count('username');
   if(count == 0) {
     console.log('用户名不存在！');
-    //return ctx.response.redirect('/login');
     await ctx.render('login', {
       title: 'OA-登录',
       error: '用户名不存在'
@@ -262,7 +226,6 @@ router.post('/login', async function (ctx, next) {
       });
     }
   }
-  //await next();
 });
 app.use(router.routes(), router.allowedMethods());
 // response
