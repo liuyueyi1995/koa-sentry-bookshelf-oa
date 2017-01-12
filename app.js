@@ -76,6 +76,12 @@ router.get('/', async function (ctx, next) {
     user: ctx.session.user
   });
 });
+router.get('/default', async function (ctx, next) {
+  await ctx.render('default', {
+    title: 'OA',
+    user: ctx.session.user
+  });
+});
 router.get('/reg', async function (ctx, next) {
   await ctx.render('reg', {
     title: 'OA-注册'
