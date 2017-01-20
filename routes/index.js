@@ -3,6 +3,7 @@ const crypto = require('crypto');
 var ds = require('../datasource')
 var model = require('../models')
 
+/**------------------------------------------------------------- */
 // 主页
 router.get('/', async function (ctx, next) {
   await ctx.render('index', {
@@ -10,7 +11,6 @@ router.get('/', async function (ctx, next) {
     user: ctx.session.user
   });
 });
-
 // 默认的欢迎页
 router.get('/default', async function (ctx, next) {
   await ctx.render('default', {
@@ -18,139 +18,12 @@ router.get('/default', async function (ctx, next) {
     user: ctx.session.user
   });
 });
-
 // 注册页
 router.get('/reg', async function (ctx, next) {
   await ctx.render('reg', {
     title: 'OA-注册'
   });
 });
-
-// 登录页
-router.get('/login', async function (ctx, next) {
-  await ctx.render('login', {
-    title: 'OA-登录'
-  });
-});
-
-// 登出请求
-router.get('/logout', async function (ctx, next) {
-  ctx.session.user = null;
-  return ctx.redirect('/');
-});
-
-// 应用角色管理页
-router.get('/user_app', async function (ctx, next) {
-  var appRole = await model.AppRoles.fetchAll(); //获取所有应用角色的列表
-  var relation = await model.UserApproles.query//////////////
-  await ctx.render('user_app', {
-    title: 'OA-应用角色管理'
-  });
-});
-
-// 数据库角色管理页
-router.get('/user_db', async function (ctx, next) {
-  await ctx.render('user_db', {
-    title: 'OA-数据库角色管理'
-  });
-});
-// WAF日志查看
-router.get('/waf_log', async function (ctx, next) {
-  var wafLogs = await model.WafLogs.fetchAll();//从数据库中查询所有的日志信息
-  var logs = {};
-  for(var i = 0;i < wafLogs.length;i++){
-    logs[i] = wafLogs.models[i].attributes;
-  }
-  await ctx.render('waf_log', {
-    title: 'OA-waf日志',
-    logs: logs
-  });
-});
-// SQLRelay日志查看
-router.get('/sqlrelay_log', async function (ctx, next) {
-  var sqlrelayLogs = await model.SqlrelayLogs.fetchAll();//从数据库中查询所有的日志信息
-  var logs = {};
-  for(var i = 0;i < sqlrelayLogs.length;i++){
-    logs[i] = sqlrelayLogs.models[i].attributes;
-  }
-  await ctx.render('sqlrelay_log', {
-    title: 'OA-sqlrelay日志',
-    logs: logs
-  });
-});
-// 采用AJAX处理对waf_log表的搜索
-router.post('/waf_log',async function(ctx,next) {
-  var logs = {};
-  var len = 0;
-  var content = ctx.request.body.content;
-  var content1 = '%'+content+'%'; 
-  if (typeof(content) == Number) {
-    var result1 = await model.WafLogs.where('id','=',content).fetchAll(); 
-    for(;len < result1.length;len++){
-      logs[len] = result1.models[len].attributes;
-    }
-  }
-  var result2 = await model.WafLogs.where('time','like',content1).fetchAll(); 
-  var result3 = await model.WafLogs.where('username','like',content1).fetchAll(); 
-  var result4 = await model.WafLogs.where('function','like',content1).fetchAll(); 
-  var result5 = await model.WafLogs.where('url','like',content1).fetchAll(); 
-  var result6 = await model.WafLogs.where('param','like',content1).fetchAll(); 
-  var result7 = await model.WafLogs.where('result','like',content1).fetchAll(); 
-  
-  for(;len < result2.length;len++){
-    logs[len] = result2.models[len].attributes;
-  }
-  for(;len < result3.length;len++){
-    logs[len] = result3.models[len].attributes;
-  }
-  for(;len < result4.length;len++){
-    logs[len] = result4.models[len].attributes;
-  }
-  for(;len < result5.length;len++){
-    logs[len] = result5.models[len].attributes;
-  }
-  for(;len < result6.length;len++){
-    logs[len] = result6.models[len].attributes;
-  }
-  for(;len < result7.length;len++){
-    logs[len] = result7.models[len].attributes;
-  }
-  ctx.body = {logs,len};
-});
-
-// 采用AJAX处理对sqlrelay_log表的搜索
-router.post('/sqlrelay_log',async function(ctx,next) {
-  var logs = {};
-  var len = 0;
-  var content = ctx.request.body.content;
-  var content1 = '%'+content+'%'; 
-  if (typeof(content) == Number) {
-    var result1 = await model.SqlrelayLogs.where('id','=',content).fetchAll(); 
-    for(;len < result1.length;len++){
-      logs[len] = result1.models[len].attributes;
-    }
-  }
-  var result2 = await model.SqlrelayLogs.where('time','like',content1).fetchAll(); 
-  var result3 = await model.SqlrelayLogs.where('username','like',content1).fetchAll(); 
-  var result4 = await model.SqlrelayLogs.where('query','like',content1).fetchAll();  
-  var result5 = await model.SqlrelayLogs.where('result','like',content1).fetchAll(); 
-  
-  for(;len < result2.length;len++){
-    logs[len] = result2.models[len].attributes;
-  }
-  for(;len < result3.length;len++){
-    logs[len] = result3.models[len].attributes;
-  }
-  for(;len < result4.length;len++){
-    logs[len] = result4.models[len].attributes;
-  }
-  for(;len < result5.length;len++){
-    logs[len] = result5.models[len].attributes;
-  }
-  console.log(len);
-  ctx.body = {logs,len};
-});
-
 // 提交注册信息
 router.post('/reg', async function (ctx, next) {
   if(ctx.request.body['username'].length > 25) {
@@ -193,7 +66,12 @@ router.post('/reg', async function (ctx, next) {
     }
   }
 });
-
+// 登录页
+router.get('/login', async function (ctx, next) {
+  await ctx.render('login', {
+    title: 'OA-登录'
+  });
+});
 // 提交登录信息
 router.post('/login', async function (ctx, next) {
   //需要判断的逻辑：用户名不存在或者密码错误
@@ -223,5 +101,150 @@ router.post('/login', async function (ctx, next) {
     }
   }
 });
+// 登出请求
+router.get('/logout', async function (ctx, next) {
+  ctx.session.user = null;
+  return ctx.redirect('/');
+});
+/**------------------------------------------------------------- */
+// 应用角色管理页
+router.get('/user_app', async function (ctx, next) {
+  //var appRole = await model.AppRoles.fetchAll(); //获取所有应用角色的列表
+  var results = await model.WebUsers.forge().fetchAll({withRelated:['approle','dbrole']});
+  
+  var relations = {};
+  for(var i = 0;i < results.length;i++){
+    relations[i] = {
+      'id': i + 1,
+      'username':results.models[i].attributes.username,
+      'approle':results.models[i].relations.approle.attributes.rolename
+    };
+  }
+  console.log(relations);
+  await ctx.render('user_app', {
+    title: 'OA-应用角色管理',
+    relations: relations
+  });
+});
+
+// 数据库角色管理页
+router.get('/user_db', async function (ctx, next) {
+  var results = await model.WebUsers.forge().fetchAll({withRelated:['approle','dbrole']});
+  
+  var relations = {};
+  for(var i = 0;i < results.length;i++){
+    relations[i] = {
+      'id': i + 1,
+      'username':results.models[i].attributes.username,
+      'approle':results.models[i].relations.dbrole.attributes.rolename
+    };
+  }
+  console.log(relations);
+  await ctx.render('user_app', {
+    title: 'OA-数据库角色管理',
+    relations: relations
+  });
+});
+/**------------------------------------------------------------- */
+// WAF日志查看
+router.get('/waf_log', async function (ctx, next) {
+  var wafLogs = await model.WafLogs.fetchAll();//从数据库中查询所有的日志信息
+  var logs = {};
+  for(var i = 0;i < wafLogs.length;i++){
+    logs[i] = wafLogs.models[i].attributes;
+  }
+  await ctx.render('waf_log', {
+    title: 'OA-waf日志',
+    logs: logs
+  });
+});
+
+// 采用AJAX处理对waf_log表的搜索
+router.post('/waf_log',async function(ctx,next) {
+  var logs = {};
+  var len = 0;
+  var content = ctx.request.body.content;
+  var content1 = '%'+content+'%'; 
+  if (typeof(content) == Number) {
+    var result1 = await model.WafLogs.where('id','=',content).fetchAll(); 
+    for(;len < result1.length;len++){
+      logs[len] = result1.models[len].attributes;
+    }
+  }
+  var result2 = await model.WafLogs.where('time','like',content1).fetchAll(); 
+  var result3 = await model.WafLogs.where('username','like',content1).fetchAll(); 
+  var result4 = await model.WafLogs.where('function','like',content1).fetchAll(); 
+  var result5 = await model.WafLogs.where('url','like',content1).fetchAll(); 
+  var result6 = await model.WafLogs.where('param','like',content1).fetchAll(); 
+  var result7 = await model.WafLogs.where('result','like',content1).fetchAll(); 
+  
+  for(;len < result2.length;len++){
+    logs[len] = result2.models[len].attributes;
+  }
+  for(;len < result3.length;len++){
+    logs[len] = result3.models[len].attributes;
+  }
+  for(;len < result4.length;len++){
+    logs[len] = result4.models[len].attributes;
+  }
+  for(;len < result5.length;len++){
+    logs[len] = result5.models[len].attributes;
+  }
+  for(;len < result6.length;len++){
+    logs[len] = result6.models[len].attributes;
+  }
+  for(;len < result7.length;len++){
+    logs[len] = result7.models[len].attributes;
+  }
+  ctx.body = {logs,len};
+});
+
+// SQLRelay日志查看
+router.get('/sqlrelay_log', async function (ctx, next) {
+  var sqlrelayLogs = await model.SqlrelayLogs.fetchAll();//从数据库中查询所有的日志信息
+  var logs = {};
+  for(var i = 0;i < sqlrelayLogs.length;i++){
+    logs[i] = sqlrelayLogs.models[i].attributes;
+  }
+  await ctx.render('sqlrelay_log', {
+    title: 'OA-sqlrelay日志',
+    logs: logs
+  });
+});
+// 采用AJAX处理对sqlrelay_log表的搜索
+router.post('/sqlrelay_log',async function(ctx,next) {
+  var logs = {};
+  var len = 0;
+  var content = ctx.request.body.content;
+  var content1 = '%'+content+'%'; 
+  if (typeof(content) == Number) {
+    var result1 = await model.SqlrelayLogs.where('id','=',content).fetchAll(); 
+    for(;len < result1.length;len++){
+      logs[len] = result1.models[len].attributes;
+    }
+  }
+  var result2 = await model.SqlrelayLogs.where('time','like',content1).fetchAll(); 
+  var result3 = await model.SqlrelayLogs.where('username','like',content1).fetchAll(); 
+  var result4 = await model.SqlrelayLogs.where('query','like',content1).fetchAll();  
+  var result5 = await model.SqlrelayLogs.where('result','like',content1).fetchAll(); 
+  
+  for(;len < result2.length;len++){
+    logs[len] = result2.models[len].attributes;
+  }
+  for(;len < result3.length;len++){
+    logs[len] = result3.models[len].attributes;
+  }
+  for(;len < result4.length;len++){
+    logs[len] = result4.models[len].attributes;
+  }
+  for(;len < result5.length;len++){
+    logs[len] = result5.models[len].attributes;
+  }
+  console.log(len);
+  ctx.body = {logs,len};
+});
+
+
+
 
 module.exports = router;

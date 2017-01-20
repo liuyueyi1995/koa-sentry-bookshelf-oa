@@ -7,31 +7,63 @@ html
     link(rel='stylesheet' href='/stylesheets/mycss.css')
     script(src='http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js')
     script(src='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js')
+    script.
+      $(function (){
+        $(document).ready(function(){
+           $('.btn-search').click(search);
+        });
+      });
+      function search() {
+        let content = $('#searchBox').val();
+        if (content) {
+          $.post('/user_app',{content:content},function(result){
+            let length = result.len;
+            if ($.isEmptyObject(result.logs)) { //如果没有查询到数据则返回提示
+              alert(`
+              No result matched the given condition!
+
+              Please retry!`);
+            } else { //如果查询到数据则动态生成表格               
+              let tbody = $('tbody');
+              tbody.html("");
+              for (var i = 0;i<length;i++) {
+                let tr = $('<tr></tr>');
+                tr.appendTo(tbody);
+                $('<td></td>').text(result.logs[i].id).appendTo(tr);
+                $('<td></td>').text(result.logs[i].time).appendTo(tr);
+                $('<td></td>').text(result.logs[i].username).appendTo(tr);
+                
+              }
+            }
+          });
+        } else {
+          alert('There is no condition!');
+        }
+      }   
   body
-    div(class='container')
-      div(class='row')
-        ul(class='list-inline')
-          li(class='col-lg-3 nonpadding')
-            p(class='content-title') 用户-应用角色映射管理
-          li(class='col-lg-6 nonpadding')
-          li(class='float-right col-lg-3 nonpadding')
-            div(class='input-group')  
-              input(type='text' class='form-control' placeholder='搜索...')
-              span(class='input-group-btn')  
-                button(class='btn btn-warning btn-search') 搜索  
-      div(class='row')
-        table(id='user_app_table' class='table')
+    div.container
+      div.row
+        ul.list-inline
+          li.col-lg-3.nonpadding
+            p.content-title 用户-应用角色映射管理
+          li.col-lg-6.nonpadding
+          li.float-right.col-lg-3.nonpadding
+            div.input-group
+              input#searchBox.form-control(type='text',placeholder='输入关键字，支持模糊查询',required)
+              span.input-group-btn
+                input.btn.btn-warning.btn-search(type='submit',value='搜索') 
+      div.row
+        table.table
           thead
             tr
-              th 序号
-              th 用户名
-              th 应用角色
-              th 操作
+              th 序号（id）
+              th 用户名（username）
+              th 应用角色（approle）
+              th 操作（manage）
           tbody
-            tr(class='success')
-              td 1
-              td liu
-              td admin
-              td
-                a(class='in-button' href='/select_approle' target='_self')
-                  button(type='button' class='btn btn-primary btn-xs btn-block') 管理
+            each relation in relations
+              tr
+              each val in relation
+                td.success #{val}
+              td.success 
+                button(type='button' class='btn btn-primary btn-xs btn-block') 管理
