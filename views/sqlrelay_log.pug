@@ -7,28 +7,78 @@ html
     link(rel='stylesheet' href='/stylesheets/mycss.css')
     script(src='http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js')
     script(src='http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js')
+    script.
+      $(function (){
+        $(document).ready(function(){
+          $('.btn-search').click(search);
+          $('td:last-child').each(function() {
+            if($.trim($(this).text()) == 'true') {
+              $(this).parent().addClass('success');
+            } else {
+              $(this).parent().addClass('danger');
+            }
+          }); 
+        });
+      });
+      function search() {
+        let content = $('#searchBox').val();
+        if (content) {
+          $.post('/sqlrelay_log',{content:content},function(result){
+            let length = result.len;
+            if ($.isEmptyObject(result.logs)) { //如果没有查询到数据则返回提示
+              alert(`
+              No result matched the given condition!
+
+              Please retry!`);
+            } else { //如果查询到数据则动态生成表格               
+              let tbody = $('tbody');
+              tbody.html("");
+              for (var i = 0;i<length;i++) {
+                let tr = $('<tr></tr>');
+                tr.appendTo(tbody);
+                $('<td></td>').text(result.logs[i].id).appendTo(tr);
+                $('<td></td>').text(result.logs[i].time).appendTo(tr);
+                $('<td></td>').text(result.logs[i].username).appendTo(tr);
+                $('<td></td>').text(result.logs[i].query).appendTo(tr);
+                $('<td></td>').text(result.logs[i].result).appendTo(tr);
+                if ($.trim(result.logs[i].result) == 'true') {
+                  tr.addClass('success');
+                } else {
+                  tr.addClass('danger');
+                }
+              }
+            }
+          });
+        } else {
+          alert('There is no condition!');
+        }
+      }   
+                  
+      
   body
     div.container
       div.row
         ul.list-inline
           li.col-lg-3.nonpadding
-            p.content-title SQLrelay日志
+            p.content-title SQLRelay日志
           li.col-lg-6.nonpadding
           li.float-right.col-lg-3.nonpadding
             div.input-group
-              input.form-control(type='text',placeholder='搜索...')
+              input#searchBox.form-control(type='text',placeholder='输入关键字，支持模糊查询',required)
               span.input-group-btn
-                button.btn.btn-warning.btn-search 搜索
-      div.row
+                input.btn.btn-warning.btn-search(type='submit',value='搜索') 
+      div#table.row
         table.table
           thead
             tr
-              th 序号
-              th 时间
-              th 应用名
-              th 操作者用户名
-              th 操作者角色
-              th 操作语句
-              th 操作结果
+              th 序号（id）
+              th 时间（time）
+              th 操作者用户名（username）
+              th 操作语句（query）
+              th 操作结果（result）
           tbody
-            
+            each log in logs
+              tr
+              each val in log
+                td #{val} 
+          

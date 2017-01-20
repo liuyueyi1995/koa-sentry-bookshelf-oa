@@ -2,60 +2,83 @@ var router = require('koa-router')();
 const crypto = require('crypto');
 var ds = require('../datasource')
 var model = require('../models')
+
+// 主页
 router.get('/', async function (ctx, next) {
   await ctx.render('index', {
     title: 'OA',
     user: ctx.session.user
   });
 });
+
+// 默认的欢迎页
 router.get('/default', async function (ctx, next) {
   await ctx.render('default', {
     title: 'OA',
     user: ctx.session.user
   });
 });
+
+// 注册页
 router.get('/reg', async function (ctx, next) {
   await ctx.render('reg', {
     title: 'OA-注册'
   });
 });
+
+// 登录页
 router.get('/login', async function (ctx, next) {
   await ctx.render('login', {
     title: 'OA-登录'
   });
 });
+
+// 登出请求
 router.get('/logout', async function (ctx, next) {
   ctx.session.user = null;
   return ctx.redirect('/');
 });
+
+// 应用角色管理页
 router.get('/user_app', async function (ctx, next) {
+  var appRole = await model.AppRoles.fetchAll(); //获取所有应用角色的列表
+  var relation = await model.UserApproles.query//////////////
   await ctx.render('user_app', {
     title: 'OA-应用角色管理'
   });
 });
+
+// 数据库角色管理页
 router.get('/user_db', async function (ctx, next) {
   await ctx.render('user_db', {
     title: 'OA-数据库角色管理'
   });
 });
+// WAF日志查看
 router.get('/waf_log', async function (ctx, next) {
   var wafLogs = await model.WafLogs.fetchAll();//从数据库中查询所有的日志信息
   var logs = {};
   for(var i = 0;i < wafLogs.length;i++){
     logs[i] = wafLogs.models[i].attributes;
   }
-  
   await ctx.render('waf_log', {
     title: 'OA-waf日志',
     logs: logs
   });
 });
+// SQLRelay日志查看
 router.get('/sqlrelay_log', async function (ctx, next) {
+  var sqlrelayLogs = await model.SqlrelayLogs.fetchAll();//从数据库中查询所有的日志信息
+  var logs = {};
+  for(var i = 0;i < sqlrelayLogs.length;i++){
+    logs[i] = sqlrelayLogs.models[i].attributes;
+  }
   await ctx.render('sqlrelay_log', {
-    title: 'OA-sqlrelay日志'
+    title: 'OA-sqlrelay日志',
+    logs: logs
   });
 });
-//采用AJAX处理对waf_log表的查询
+// 采用AJAX处理对waf_log表的搜索
 router.post('/waf_log',async function(ctx,next) {
   var logs = {};
   var len = 0;
@@ -95,6 +118,40 @@ router.post('/waf_log',async function(ctx,next) {
   ctx.body = {logs,len};
 });
 
+// 采用AJAX处理对sqlrelay_log表的搜索
+router.post('/sqlrelay_log',async function(ctx,next) {
+  var logs = {};
+  var len = 0;
+  var content = ctx.request.body.content;
+  var content1 = '%'+content+'%'; 
+  if (typeof(content) == Number) {
+    var result1 = await model.SqlrelayLogs.where('id','=',content).fetchAll(); 
+    for(;len < result1.length;len++){
+      logs[len] = result1.models[len].attributes;
+    }
+  }
+  var result2 = await model.SqlrelayLogs.where('time','like',content1).fetchAll(); 
+  var result3 = await model.SqlrelayLogs.where('username','like',content1).fetchAll(); 
+  var result4 = await model.SqlrelayLogs.where('query','like',content1).fetchAll();  
+  var result5 = await model.SqlrelayLogs.where('result','like',content1).fetchAll(); 
+  
+  for(;len < result2.length;len++){
+    logs[len] = result2.models[len].attributes;
+  }
+  for(;len < result3.length;len++){
+    logs[len] = result3.models[len].attributes;
+  }
+  for(;len < result4.length;len++){
+    logs[len] = result4.models[len].attributes;
+  }
+  for(;len < result5.length;len++){
+    logs[len] = result5.models[len].attributes;
+  }
+  console.log(len);
+  ctx.body = {logs,len};
+});
+
+// 提交注册信息
 router.post('/reg', async function (ctx, next) {
   if(ctx.request.body['username'].length > 25) {
     //判断用户名是否过长，数据库设置username字段为varchar(25)
@@ -137,6 +194,7 @@ router.post('/reg', async function (ctx, next) {
   }
 });
 
+// 提交登录信息
 router.post('/login', async function (ctx, next) {
   //需要判断的逻辑：用户名不存在或者密码错误
   var count = await model.Users.where('username', ctx.request.body['username']).count('username');
