@@ -136,11 +136,11 @@ router.get('/user_db', async function (ctx, next) {
     relations[i] = {
       'id': i + 1,
       'username':results.models[i].attributes.username,
-      'approle':results.models[i].relations.dbrole.attributes.rolename
+      'dbrole':results.models[i].relations.dbrole.attributes.rolename
     };
   }
   console.log(relations);
-  await ctx.render('user_app', {
+  await ctx.render('user_db', {
     title: 'OA-数据库角色管理',
     relations: relations
   });
